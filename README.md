@@ -5,10 +5,6 @@ A standalone, browser-based decision support system that assesses drinking water
 
 ---
 
-## 🌐 Live Demo
-
-> Deploy via [Netlify Drop](https://app.netlify.com/drop) by dragging `index.html` — no build step required.
-
 ---
 
 ## 📸 Features
