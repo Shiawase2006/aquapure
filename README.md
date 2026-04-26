@@ -27,33 +27,6 @@ A standalone, browser-based decision support system that assesses drinking water
 
 ---
 
-## 🚀 Getting Started
-
-### Option 1 — Open locally
-No installation required. Simply download `index.html` and open it in any modern browser.
-
-```bash
-git clone https://github.com/your-username/aquapure.git
-cd aquapure
-open index.html   # macOS
-# or double-click index.html on Windows/Linux
-```
-
-### Option 2 — Deploy to Netlify (recommended for sharing)
-1. Rename `aquapure-v2.html` to `index.html`
-2. Go to [app.netlify.com/drop](https://app.netlify.com/drop)
-3. Drag and drop the file
-4. Get your public URL instantly
-
-### Option 3 — GitHub Pages
-1. Push this repo to GitHub
-2. Go to **Settings → Pages**
-3. Set source to `main` branch, root folder
-4. Rename the file to `index.html`
-5. Your site will be live at `https://your-username.github.io/aquapure`
-
----
-
 ## 🧪 How the Assessment Works
 
 AquaPure uses a **weighted scoring model** across three primary water quality parameters:
