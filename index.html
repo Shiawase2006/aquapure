@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <base target="_self">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AquaPure | Water Quality Assessment System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#1e40af", secondary: "#0ea5e9", accent: "#10b981",
+                        danger: "#ef4444", warning: "#f59e0b", safe: "#10b981"
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s ease-in-out infinite',
+                        'sodis': 'sodis 8s linear infinite',
+                        'boiling': 'boiling 4s ease-in-out infinite',
+                        'uv-light': 'uv-light 2s linear infinite',
+                        'carbon-filter': 'carbon-filter 5s linear infinite',
+                        'reverse-osmosis': 'reverse-osmosis 6s linear infinite',
+                        'drop': 'drop 2s ease-in infinite'
+                    },
+                    keyframes: {
+                        sodis: { '0%': { transform: 'rotate(0deg)' }, '100%': { transform: 'rotate(360deg)' } },
+                        boiling: { '0%,100%': { transform: 'scale(1)' }, '50%': { transform: 'scale(1.2)' } },
+                        'uv-light': { '0%,100%': { opacity: '0.3' }, '50%': { opacity: '1' } },
+                        'carbon-filter': { '0%,100%': { transform: 'translateY(0) scale(1)' }, '50%': { transform: 'translateY(-10px) scale(1.1)' } },
+                        'reverse-osmosis': { '0%': { transform: 'translateX(-50%)' }, '100%': { transform: 'translateX(50%)' } },
+                        drop: { '0%': { transform: 'translateY(-100px)', opacity: '0' }, '100%': { transform: 'translateY(0)', opacity: '1' } }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .river-btn { transition: all 0.15s; }
+        .river-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(30,64,175,0.15); }
+        .river-btn.active { background: #1e40af; color: white; border-color: #1e40af; }
+        .sparkline-bar { transition: height 0.3s ease; }
+        #aiAdvisorPanel { transition: all 0.3s ease; }
+        .tab-btn.active { border-bottom: 2px solid #1e40af; color: #1e40af; font-weight: 600; }
+        .source-badge { font-size: 11px; padding: 2px 8px; border-radius: 9999px; }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-b from-blue-50 to-white">
+
+<!-- Navigation -->
+<header class="bg-white shadow-lg sticky top-0 z-50">
+    <nav class="container mx-auto px-4 py-4">
+        <div class="flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
+                    <i class="fas fa-tint text-white text-xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-primary">Aqua<span class="text-accent">Pure</span></h1>
+                <span class="hidden sm:inline text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full ml-2">v2</span>
+            </div>
+            <div class="hidden md:flex space-x-8">
+                <a href="#home" class="text-gray-700 hover:text-primary font-medium transition-colors">Home</a>
+                <a href="#assessment" class="text-gray-700 hover:text-primary font-medium transition-colors">Assessment</a>
+                <a href="#methods" class="text-gray-700 hover:text-primary font-medium transition-colors">Methods</a>
+                <a href="#visualization" class="text-gray-700 hover:text-primary font-medium transition-colors">Analytics</a>
+                <a href="#database" class="text-gray-700 hover:text-primary font-medium transition-colors">Stack</a>
+            </div>
+            <button id="mobileMenuBtn" class="md:hidden text-gray-700 p-2">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+        </div>
+        <div id="mobileMenu" class="hidden md:hidden mt-4 space-y-2 border-t pt-4">
+            <a href="#home" class="block text-gray-700 hover:text-primary py-2">Home</a>
+            <a href="#assessment" class="block text-gray-700 hover:text-primary py-2">Assessment</a>
+            <a href="#methods" class="block text-gray-700 hover:text-primary py-2">Methods</a>
+            <a href="#visualization" class="block text-gray-700 hover:text-primary py-2">Analytics</a>
+        </div>
+    </nav>
+</header>
+
+<main>
+<!-- Hero -->
+<section id="home" class="py-16 md:py-24">
+    <div class="container mx-auto px-4">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div>
+                <div class="inline-flex items-center bg-blue-50 text-primary px-4 py-2 rounded-full text-sm font-medium mb-6">
+                    <i class="fas fa-satellite-dish mr-2"></i> Now with AI-powered water advisor
+                </div>
+                <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+                    Intelligent Water Quality <span class="text-primary">Assessment</span> System
+                </h2>
+                <p class="text-lg text-gray-600 mb-8">
+                    A decision support system that assesses drinking water quality and recommends chlorine-free purification methods based on pH, turbidity, and TDS — now with river body presets and AI-driven insights.
+                </p>
+                <div class="flex flex-wrap gap-4">
+                    <a href="#assessment" class="bg-primary text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors">Start Assessment</a>
+                    <a href="#methods" class="border-2 border-primary text-primary px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors">View Methods</a>
+                </div>
+            </div>
+            <div class="bg-white rounded-2xl shadow-2xl p-8">
+                <div class="flex items-center justify-center mb-6">
+                    <div class="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center animate-pulse-slow">
+                        <i class="fas fa-water text-primary text-4xl"></i>
+                    </div>
+                </div>
+                <h3 class="text-2xl font-bold text-center text-gray-800 mb-4">Key Parameters Monitored</h3>
+                <div class="grid grid-cols-3 gap-4">
+                    <div class="text-center p-4 bg-blue-50 rounded-lg">
+                        <div class="text-3xl font-bold text-primary mb-2">pH</div>
+                        <div class="text-sm text-gray-600">Acidity/Alkalinity</div>
+                    </div>
+                    <div class="text-center p-4 bg-blue-50 rounded-lg">
+                        <div class="text-3xl font-bold text-primary mb-2">TDS</div>
+                        <div class="text-sm text-gray-600">Total Dissolved Solids</div>
+                    </div>
+                    <div class="text-center p-4 bg-blue-50 rounded-lg">
+                        <div class="text-3xl font-bold text-primary mb-2">NTU</div>
+                        <div class="text-sm text-gray-600">Turbidity</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Assessment -->
+<section id="assessment" class="py-16 bg-gray-50">
+    <div class="container mx-auto px-4">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">Water Quality Assessment</h2>
+            <p class="text-gray-600 max-w-2xl mx-auto">Select a river/source preset or enter your own parameters to get chlorine-free purification recommendations</p>
+        </div>
+
+        <!-- River Body Presets -->
+        <div class="max-w-5xl mx-auto mb-8">
+            <div class="bg-white rounded-2xl shadow-xl p-6">
+                <div class="flex items-center mb-4">
+                    <i class="fas fa-water text-primary mr-2"></i>
+                    <h3 class="text-lg font-bold text-gray-800">Quick-Load: River & Source Presets</h3>
+                    <span class="ml-3 text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full">Typical reference values — not live sensor data</span>
+                </div>
+
+                <!-- Tabs -->
+                <div class="flex space-x-4 border-b mb-4">
+                    <button class="tab-btn active pb-2 text-sm" data-tab="asia">Asia</button>
+                    <button class="tab-btn pb-2 text-sm text-gray-500 hover:text-primary" data-tab="europe">Europe</button>
+                    <button class="tab-btn pb-2 text-sm text-gray-500 hover:text-primary" data-tab="americas">Americas</button>
+                    <button class="tab-btn pb-2 text-sm text-gray-500 hover:text-primary" data-tab="africa">Africa &amp; Others</button>
+                    <button class="tab-btn pb-2 text-sm text-gray-500 hover:text-primary" data-tab="sources">Source Types</button>
+                </div>
+
+                <div id="presetGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3"></div>
+
+                <p class="text-xs text-gray-400 mt-4">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    Reference ranges are drawn from published water quality studies and WHO/BIS monitoring reports. Real-time sensor integration would require a local IoT device or API connection.
+                </p>
+            </div>
+        </div>
+
+        <!-- Form -->
+        <div class="max-w-5xl mx-auto bg-white rounded-2xl shadow-xl p-8">
+            <form id="waterAssessmentForm" class="space-y-8">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700"><i class="fas fa-vial text-primary mr-2"></i>pH Level (0–14)</label>
+                        <input type="number" step="0.1" min="0" max="14" id="phLevel" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Enter pH value" required>
+                        <div class="text-sm text-gray-500">Standard: 6.5 – 8.5</div>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700"><i class="fas fa-cloud text-primary mr-2"></i>Turbidity (NTU)</label>
+                        <input type="number" step="0.1" min="0" id="turbidity" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Enter turbidity in NTU" required>
+                        <div class="text-sm text-gray-500">Standard: &lt; 5 NTU</div>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700"><i class="fas fa-weight text-primary mr-2"></i>TDS (mg/L)</label>
+                        <input type="number" step="1" min="0" id="tds" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Enter TDS value" required>
+                        <div class="text-sm text-gray-500">Standard: &lt; 500 mg/L</div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700"><i class="fas fa-thermometer-half text-primary mr-2"></i>Temperature (°C)</label>
+                        <input type="number" step="0.1" id="temperature" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Temperature" value="25">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700"><i class="fas fa-flask text-primary mr-2"></i>Chlorine Residual (mg/L)</label>
+                        <input type="number" step="0.01" min="0" id="chlorine" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Chlorine level" value="0">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700"><i class="fas fa-tag text-primary mr-2"></i>Source Type</label>
+                        <select id="sourceType" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                            <option>River</option>
+                            <option>Borewell</option>
+                            <option>Municipal</option>
+                            <option>Lake / Pond</option>
+                            <option>Rainwater</option>
+                            <option>Spring</option>
+                            <option>Groundwater</option>
+                            <option>Tap Water</option>
+                            <option>Other</option>
+                        </select>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700"><i class="fas fa-tags text-primary mr-2"></i>Dataset Tag</label>
+                        <input type="text" id="datasetTag" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="e.g. Village A, Site B" value="General">
+                    </div>
+                </div>
+                <div class="pt-4 flex flex-col sm:flex-row gap-3">
+                    <button type="submit" class="flex-1 bg-primary text-white py-4 rounded-lg font-semibold text-lg hover:bg-blue-700 transition-colors flex items-center justify-center">
+                        <i class="fas fa-calculator mr-3"></i> Assess Water Quality &amp; Get Recommendations
+                    </button>
+                    <button type="button" id="exportCsvBtn" class="sm:w-48 border-2 border-primary text-primary py-4 rounded-lg font-semibold hover:bg-blue-50 transition-colors flex items-center justify-center" title="Export all saved records as CSV">
+                        <i class="fas fa-download mr-2"></i> Export CSV
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Results -->
+        <div id="resultsSection" class="max-w-5xl mx-auto mt-12 hidden">
+            <div class="bg-white rounded-2xl shadow-xl p-8">
+                <div class="flex justify-between items-center mb-8">
+                    <h3 class="text-2xl font-bold text-gray-900">Assessment Results</h3>
+                    <div id="waterCategory" class="px-4 py-2 rounded-full font-semibold"></div>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="lg:col-span-2">
+                        <h4 class="text-lg font-semibold text-gray-800 mb-4">Parameter Analysis</h4>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                                <div class="flex items-center">
+                                    <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-4"><i class="fas fa-vial text-primary"></i></div>
+                                    <div><div class="font-medium">pH Level</div><div class="text-sm text-gray-500" id="phValue">-</div></div>
+                                </div>
+                                <div id="phStatus" class="px-3 py-1 rounded-full text-sm font-medium"></div>
+                            </div>
+                            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                                <div class="flex items-center">
+                                    <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-4"><i class="fas fa-cloud text-primary"></i></div>
+                                    <div><div class="font-medium">Turbidity</div><div class="text-sm text-gray-500" id="turbidityValue">-</div></div>
+                                </div>
+                                <div id="turbidityStatus" class="px-3 py-1 rounded-full text-sm font-medium"></div>
+                            </div>
+                            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                                <div class="flex items-center">
+                                    <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-4"><i class="fas fa-weight text-primary"></i></div>
+                                    <div><div class="font-medium">Total Dissolved Solids</div><div class="text-sm text-gray-500" id="tdsValue">-</div></div>
+                                </div>
+                                <div id="tdsStatus" class="px-3 py-1 rounded-full text-sm font-medium"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gradient-to-br from-primary to-secondary rounded-xl p-6 text-white">
+                        <h4 class="text-lg font-semibold mb-4">Overall Water Quality</h4>
+                        <div class="text-center mb-6">
+                            <div class="text-5xl font-bold mb-2" id="qualityScore">-</div>
+                            <div class="text-sm opacity-90">Quality Score</div>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="flex justify-between"><span>Safety Level:</span><span class="font-semibold" id="safetyLevel">-</span></div>
+                            <div class="flex justify-between"><span>Treatment Needed:</span><span class="font-semibold" id="treatmentNeeded">-</span></div>
+                            <div class="flex justify-between"><span>Risk Category:</span><span class="font-semibold" id="riskCategory">-</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Advisor -->
+                <div class="mt-8 border border-blue-200 rounded-xl p-6 bg-blue-50">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center mr-3">
+                                <i class="fas fa-robot text-white text-sm"></i>
+                            </div>
+                            <h4 class="font-semibold text-gray-800">AI Water Quality Advisor</h4>
+                        </div>
+                        <button id="getAiAdviceBtn" class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors flex items-center">
+                            <i class="fas fa-magic mr-2"></i> Get AI Advice
+                        </button>
+                    </div>
+                    <div id="aiAdvisorPanel" class="text-sm text-gray-600">
+                        Click "Get AI Advice" to receive a detailed interpretation of your water quality results and personalised treatment guidance.
+                    </div>
+                </div>
+
+                <!-- Recommended Methods -->
+                <div class="mt-10">
+                    <h4 class="text-lg font-semibold text-gray-800 mb-6">Recommended Chlorine-Free Purification Methods</h4>
+                    <div id="recommendedMethods" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Methods -->
+<section id="methods" class="py-16">
+    <div class="container mx-auto px-4">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">Chlorine-Free Purification Methods</h2>
+            <p class="text-gray-600 max-w-3xl mx-auto">Interactive animations demonstrating how each purification method works</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- SODIS -->
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+                <div class="p-6">
+                    <div class="flex items-center justify-center mb-6">
+                        <div class="relative w-32 h-32">
+                            <div class="absolute inset-0 bg-yellow-100 rounded-full animate-sodis"></div>
+                            <div class="absolute inset-4 bg-yellow-300 rounded-full flex items-center justify-center"><i class="fas fa-sun text-white text-3xl"></i></div>
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">SODIS (Solar Disinfection)</h3>
+                    <p class="text-gray-600 mb-4">Uses solar UV radiation and heat to inactivate pathogens in PET bottles exposed to sunlight for 6+ hours.</p>
+                    <div class="flex items-center text-sm text-gray-500"><i class="fas fa-clock mr-2"></i><span>6–48 hours exposure</span></div>
+                </div>
+                <div class="bg-yellow-50 px-6 py-4 border-t">
+                    <div class="flex justify-between items-center">
+                        <span class="font-medium text-gray-700">Effectiveness:</span>
+                        <span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-medium">High for Bacteria/Viruses</span>
+                    </div>
+                </div>
+            </div>
+            <!-- Carbon -->
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+                <div class="p-6">
+                    <div class="flex items-center justify-center mb-6">
+                        <div class="relative w-32 h-32">
+                            <div class="absolute inset-0 bg-gray-200 rounded-lg"></div>
+                            <div class="absolute inset-4 bg-gray-800 rounded-lg flex items-center justify-center animate-carbon-filter"><i class="fas fa-filter text-white text-3xl"></i></div>
+                            <div class="absolute -top-2 -right-2 w-8 h-8 bg-blue-500 rounded-full animate-drop"></div>
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Activated Carbon Filtration</h3>
+                    <p class="text-gray-600 mb-4">Removes organic compounds, chlorine, and improves taste/odor through adsorption on carbon surface.</p>
+                    <div class="flex items-center text-sm text-gray-500"><i class="fas fa-filter mr-2"></i><span>Removes chemicals &amp; odors</span></div>
+                </div>
+                <div class="bg-gray-50 px-6 py-4 border-t">
+                    <div class="flex justify-between items-center">
+                        <span class="font-medium text-gray-700">Effectiveness:</span>
+                        <span class="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm font-medium">Chemicals &amp; Taste</span>
+                    </div>
+                </div>
+            </div>
+            <!-- RO -->
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+                <div class="p-6">
+                    <div class="flex items-center justify-center mb-6">
+                        <div class="relative w-32 h-32">
+                            <div class="absolute inset-0 bg-blue-100 rounded-lg overflow-hidden">
+                                <div class="absolute inset-0 flex items-center"><div class="h-1 w-full bg-blue-300 animate-reverse-osmosis"></div></div>
+                            </div>
+                            <div class="absolute inset-4 bg-white border-4 border-blue-300 rounded-lg flex items-center justify-center"><i class="fas fa-exchange-alt text-blue-500 text-3xl"></i></div>
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Reverse Osmosis</h3>
+                    <p class="text-gray-600 mb-4">Semi-permeable membrane removes dissolved solids, heavy metals, and microorganisms under pressure.</p>
+                    <div class="flex items-center text-sm text-gray-500"><i class="fas fa-tint mr-2"></i><span>Removes 95–99% contaminants</span></div>
+                </div>
+                <div class="bg-blue-50 px-6 py-4 border-t">
+                    <div class="flex justify-between items-center">
+                        <span class="font-medium text-gray-700">Effectiveness:</span>
+                        <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">Comprehensive</span>
+                    </div>
+                </div>
+            </div>
+            <!-- Boiling -->
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+                <div class="p-6">
+                    <div class="flex items-center justify-center mb-6">
+                        <div class="relative w-32 h-32">
+                            <div class="absolute inset-0 bg-red-100 rounded-full animate-boiling"></div>
+                            <div class="absolute inset-4 bg-red-500 rounded-full flex items-center justify-center"><i class="fas fa-fire text-white text-3xl"></i></div>
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Boiling</h3>
+                    <p class="text-gray-600 mb-4">Heating water to 100°C for 1–3 minutes kills pathogens, viruses, and bacteria effectively.</p>
+                    <div class="flex items-center text-sm text-gray-500"><i class="fas fa-thermometer-full mr-2"></i><span>100°C for 1–3 minutes</span></div>
+                </div>
+                <div class="bg-red-50 px-6 py-4 border-t">
+                    <div class="flex justify-between items-center">
+                        <span class="font-medium text-gray-700">Effectiveness:</span>
+                        <span class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-medium">Pathogen Elimination</span>
+                    </div>
+                </div>
+            </div>
+            <!-- UV -->
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+                <div class="p-6">
+                    <div class="flex items-center justify-center mb-6">
+                        <div class="relative w-32 h-32">
+                            <div class="absolute inset-0 bg-purple-100 rounded-lg">
+                                <div class="absolute inset-0 flex items-center justify-center"><div class="w-16 h-16 border-4 border-purple-300 rounded-full animate-uv-light"></div></div>
+                            </div>
+                            <div class="absolute inset-8 bg-purple-500 rounded-full flex items-center justify-center"><i class="fas fa-bolt text-white text-2xl"></i></div>
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">UV Radiation</h3>
+                    <p class="text-gray-600 mb-4">Ultraviolet light disrupts DNA of microorganisms, preventing reproduction without chemicals.</p>
+                    <div class="flex items-center text-sm text-gray-500"><i class="fas fa-lightbulb mr-2"></i><span>Instant disinfection</span></div>
+                </div>
+                <div class="bg-purple-50 px-6 py-4 border-t">
+                    <div class="flex justify-between items-center">
+                        <span class="font-medium text-gray-700">Effectiveness:</span>
+                        <span class="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm font-medium">Microorganism Control</span>
+                    </div>
+                </div>
+            </div>
+            <!-- Combination -->
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+                <div class="p-6">
+                    <div class="flex items-center justify-center mb-6">
+                        <div class="relative w-32 h-32">
+                            <div class="absolute inset-0 bg-gradient-to-br from-green-100 to-blue-100 rounded-lg animate-pulse-slow"></div>
+                            <div class="absolute inset-4 bg-gradient-to-br from-green-400 to-blue-500 rounded-lg flex items-center justify-center"><i class="fas fa-cogs text-white text-3xl"></i></div>
+                            <div class="absolute -top-2 -left-2 w-6 h-6 bg-yellow-400 rounded-full"></div>
+                            <div class="absolute -top-2 -right-2 w-6 h-6 bg-red-400 rounded-full"></div>
+                            <div class="absolute -bottom-2 -left-2 w-6 h-6 bg-purple-400 rounded-full"></div>
+                            <div class="absolute -bottom-2 -right-2 w-6 h-6 bg-blue-400 rounded-full"></div>
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Combination Systems</h3>
+                    <p class="text-gray-600 mb-4">Integrated multi-stage systems combining multiple methods for comprehensive water treatment.</p>
+                    <div class="flex items-center text-sm text-gray-500"><i class="fas fa-layer-group mr-2"></i><span>Multi-stage purification</span></div>
+                </div>
+                <div class="bg-gradient-to-r from-green-50 to-blue-50 px-6 py-4 border-t">
+                    <div class="flex justify-between items-center">
+                        <span class="font-medium text-gray-700">Effectiveness:</span>
+                        <span class="px-3 py-1 bg-gradient-to-r from-green-100 to-blue-100 text-gray-800 rounded-full text-sm font-medium">Maximum Protection</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Analytics -->
+<section id="visualization" class="py-16 bg-gray-50">
+    <div class="container mx-auto px-4">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">Water Quality Analytics</h2>
+            <p class="text-gray-600 max-w-3xl mx-auto">Trends, averages, and predictions from your saved assessment records</p>
+        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Averages + Sparklines + Prediction -->
+            <div class="bg-white rounded-2xl shadow-xl p-6">
+                <h3 class="text-xl font-bold text-gray-900 mb-6">Parameter Trends</h3>
+                <!-- Sparklines -->
+                <div id="sparklineArea" class="mb-6">
+                    <div class="text-sm text-gray-500 text-center py-8">Submit samples to see trend sparklines</div>
+                </div>
+                <div class="mt-4 grid grid-cols-3 gap-4">
+                    <div class="text-center p-3 bg-blue-50 rounded-lg">
+                        <div class="text-lg font-bold text-primary" id="avgPh">--</div>
+                        <div class="text-sm text-gray-600">Avg pH</div>
+                    </div>
+                    <div class="text-center p-3 bg-blue-50 rounded-lg">
+                        <div class="text-lg font-bold text-primary" id="avgTurbidity">--</div>
+                        <div class="text-sm text-gray-600">Avg Turbidity</div>
+                    </div>
+                    <div class="text-center p-3 bg-blue-50 rounded-lg">
+                        <div class="text-lg font-bold text-primary" id="avgTds">--</div>
+                        <div class="text-sm text-gray-600">Avg TDS</div>
+                    </div>
+                </div>
+                <div class="mt-6 pt-6 border-t">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
+                        <div>
+                            <h4 class="font-semibold text-gray-800">Future Water Quality Prediction</h4>
+                            <p class="text-sm text-gray-500">Linear regression on saved records, filtered by tag</p>
+                        </div>
+                        <select id="predictionTagFilter" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                            <option value="all">All Tags</option>
+                        </select>
+                    </div>
+                    <div id="predictionSummary" class="p-4 bg-blue-50 rounded-lg text-sm text-gray-600">
+                        Save at least 2 tagged records to generate a future category prediction.
+                    </div>
+                </div>
+            </div>
+
+            <!-- History -->
+            <div class="bg-white rounded-2xl shadow-xl p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-bold text-gray-900">Saved Assessment Records</h3>
+                    <button id="clearHistoryBtn" class="text-sm text-red-500 hover:text-red-700 border border-red-200 px-3 py-1 rounded-lg hover:bg-red-50 transition-colors">
+                        <i class="fas fa-trash mr-1"></i> Clear All
+                    </button>
+                </div>
+                <div class="space-y-6">
+                    <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                        <div>
+                            <div class="font-medium text-gray-900">Stored samples</div>
+                            <div class="text-sm text-gray-500">Saved on this device in real time</div>
+                        </div>
+                        <span id="recordCount" class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">0 records</span>
+                    </div>
+                    <div class="pt-2 border-t">
+                        <h4 class="font-semibold text-gray-800 mb-4">History</h4>
+                        <div id="historyList" class="space-y-3">
+                            <div class="p-4 bg-gray-50 rounded-lg text-sm text-gray-500">Your submitted assessment records will appear here.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stack -->
+<section id="database" class="py-16">
+    <div class="container mx-auto px-4">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">Technology Stack</h2>
+            <p class="text-gray-600 max-w-3xl mx-auto">Core technologies used in this standalone water quality assessment file</p>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-6">
+            <div class="bg-white rounded-xl shadow-lg p-6 text-center hover:shadow-xl transition-shadow">
+                <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4"><i class="fas fa-code text-blue-500 text-3xl"></i></div>
+                <h4 class="font-bold text-gray-900 mb-2">HTML5</h4>
+                <p class="text-sm text-gray-600">Single-file structure</p>
+            </div>
+            <div class="bg-white rounded-xl shadow-lg p-6 text-center hover:shadow-xl transition-shadow">
+                <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4"><i class="fas fa-paint-brush text-green-500 text-3xl"></i></div>
+                <h4 class="font-bold text-gray-900 mb-2">Tailwind CDN</h4>
+                <p class="text-sm text-gray-600">Responsive styling</p>
+            </div>
+            <div class="bg-white rounded-xl shadow-lg p-6 text-center hover:shadow-xl transition-shadow">
+                <div class="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4"><i class="fas fa-bolt text-yellow-500 text-3xl"></i></div>
+                <h4 class="font-bold text-gray-900 mb-2">JavaScript</h4>
+                <p class="text-sm text-gray-600">Assessment logic</p>
+            </div>
+            <div class="bg-white rounded-xl shadow-lg p-6 text-center hover:shadow-xl transition-shadow">
+                <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4"><i class="fas fa-save text-red-500 text-3xl"></i></div>
+                <h4 class="font-bold text-gray-900 mb-2">LocalStorage</h4>
+                <p class="text-sm text-gray-600">Persistent history</p>
+            </div>
+            <div class="bg-white rounded-xl shadow-lg p-6 text-center hover:shadow-xl transition-shadow">
+                <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4"><i class="fas fa-robot text-purple-500 text-3xl"></i></div>
+                <h4 class="font-bold text-gray-900 mb-2">Claude API</h4>
+                <p class="text-sm text-gray-600">AI water advisor</p>
+            </div>
+        </div>
+    </div>
+</section>
+</main>
+
+<footer class="bg-gray-900 text-white py-12">
+    <div class="container mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div>
+                <div class="flex items-center space-x-2 mb-6">
+                    <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center"><i class="fas fa-tint text-primary text-xl"></i></div>
+                    <h3 class="text-2xl font-bold">Aqua<span class="text-accent">Pure</span></h3>
+                </div>
+                <p class="text-gray-400">Intelligent water quality assessment system for safe drinking water recommendations. Now with river body presets and AI-powered guidance.</p>
+            </div>
+            <div>
+                <h4 class="text-lg font-semibold mb-6">Quick Links</h4>
+                <ul class="space-y-3">
+                    <li><a href="#home" class="text-gray-400 hover:text-white transition-colors">Home</a></li>
+                    <li><a href="#assessment" class="text-gray-400 hover:text-white transition-colors">Assessment</a></li>
+                    <li><a href="#methods" class="text-gray-400 hover:text-white transition-colors">Methods</a></li>
+                    <li><a href="#visualization" class="text-gray-400 hover:text-white transition-colors">Analytics</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-lg font-semibold mb-6">Water Parameters</h4>
+                <ul class="space-y-3">
+                    <li class="text-gray-400">pH Level (6.5–8.5)</li>
+                    <li class="text-gray-400">Turbidity (&lt;5 NTU)</li>
+                    <li class="text-gray-400">TDS (&lt;500 mg/L)</li>
+                    <li class="text-gray-400">Temperature &amp; Chlorine</li>
+                </ul>
+            </div>
+        </div>
+        <div class="border-t border-gray-800 mt-12 pt-8 text-center text-gray-500 text-sm">
+            AquaPure v2 &mdash; Reference values sourced from WHO, BIS, USEPA, and published water quality studies.
+        </div>
+    </div>
+</footer>
+
+<script>
+const HISTORY_STORAGE_KEY = 'aquapure-history-v2';
+
+/* ─── PRESETS ─── */
+const PRESETS = {
+    asia: [
+        { name: 'Ganga (Varanasi)', ph: 7.8, turbidity: 45, tds: 310, temp: 28, src: 'River', tag: 'Ganga' },
+        { name: 'Yamuna (Delhi)', ph: 7.6, turbidity: 62, tds: 480, temp: 27, src: 'River', tag: 'Yamuna' },
+        { name: 'Brahmaputra', ph: 7.2, turbidity: 28, tds: 120, temp: 22, src: 'River', tag: 'Brahmaputra' },
+        { name: 'Godavari', ph: 7.5, turbidity: 18, tds: 280, temp: 30, src: 'River', tag: 'Godavari' },
+        { name: 'Krishna', ph: 7.4, turbidity: 14, tds: 320, temp: 29, src: 'River', tag: 'Krishna' },
+        { name: 'Indus', ph: 7.3, turbidity: 22, tds: 210, temp: 20, src: 'River', tag: 'Indus' },
+        { name: 'Cauvery', ph: 7.6, turbidity: 8, tds: 190, temp: 28, src: 'River', tag: 'Cauvery' },
+        { name: 'Mekong', ph: 7.1, turbidity: 35, tds: 165, temp: 26, src: 'River', tag: 'Mekong' },
+        { name: 'Yangtze', ph: 7.4, turbidity: 55, tds: 280, temp: 18, src: 'River', tag: 'Yangtze' },
+        { name: 'Ganges Delta', ph: 7.9, turbidity: 80, tds: 520, temp: 30, src: 'River', tag: 'GangesDelta' },
+    ],
+    europe: [
+        { name: 'Thames (London)', ph: 7.6, turbidity: 4, tds: 310, temp: 13, src: 'River', tag: 'Thames' },
+        { name: 'Rhine', ph: 7.8, turbidity: 5, tds: 350, temp: 14, src: 'River', tag: 'Rhine' },
+        { name: 'Danube', ph: 7.5, turbidity: 12, tds: 290, temp: 16, src: 'River', tag: 'Danube' },
+        { name: 'Seine', ph: 7.7, turbidity: 6, tds: 275, temp: 13, src: 'River', tag: 'Seine' },
+        { name: 'Elbe', ph: 7.4, turbidity: 8, tds: 310, temp: 12, src: 'River', tag: 'Elbe' },
+        { name: 'Volga', ph: 7.6, turbidity: 10, tds: 240, temp: 10, src: 'River', tag: 'Volga' },
+    ],
+    americas: [
+        { name: 'Mississippi', ph: 7.8, turbidity: 40, tds: 340, temp: 20, src: 'River', tag: 'Mississippi' },
+        { name: 'Amazon', ph: 6.2, turbidity: 15, tds: 45, temp: 28, src: 'River', tag: 'Amazon' },
+        { name: 'Colorado', ph: 8.1, turbidity: 8, tds: 620, temp: 15, src: 'River', tag: 'Colorado' },
+        { name: 'Rio Grande', ph: 7.9, turbidity: 25, tds: 540, temp: 22, src: 'River', tag: 'RioGrande' },
+        { name: 'Orinoco', ph: 6.5, turbidity: 20, tds: 60, temp: 27, src: 'River', tag: 'Orinoco' },
+        { name: 'St. Lawrence', ph: 7.3, turbidity: 3, tds: 120, temp: 10, src: 'River', tag: 'StLawrence' },
+    ],
+    africa: [
+        { name: 'Nile (Cairo)', ph: 7.9, turbidity: 20, tds: 280, temp: 26, src: 'River', tag: 'Nile' },
+        { name: 'Congo River', ph: 6.8, turbidity: 30, tds: 35, temp: 25, src: 'River', tag: 'Congo' },
+        { name: 'Niger', ph: 7.2, turbidity: 42, tds: 95, temp: 28, src: 'River', tag: 'Niger' },
+        { name: 'Zambezi', ph: 7.4, turbidity: 18, tds: 115, temp: 24, src: 'River', tag: 'Zambezi' },
+        { name: 'Orange River', ph: 7.8, turbidity: 30, tds: 320, temp: 20, src: 'River', tag: 'OrangeR' },
+    ],
+    sources: [
+        { name: 'Municipal Tap', ph: 7.2, turbidity: 1, tds: 200, temp: 22, src: 'Municipal', tag: 'Municipal' },
+        { name: 'Deep Borewell', ph: 7.8, turbidity: 2, tds: 650, temp: 28, src: 'Borewell', tag: 'Borewell' },
+        { name: 'Shallow Well', ph: 6.8, turbidity: 8, tds: 420, temp: 26, src: 'Groundwater', tag: 'ShallowWell' },
+        { name: 'Rainwater', ph: 6.2, turbidity: 1, tds: 30, temp: 25, src: 'Rainwater', tag: 'Rain' },
+        { name: 'Mountain Spring', ph: 7.0, turbidity: 0.5, tds: 95, temp: 12, src: 'Spring', tag: 'Spring' },
+        { name: 'Village Pond', ph: 7.5, turbidity: 22, tds: 380, temp: 28, src: 'Lake / Pond', tag: 'Pond' },
+    ]
+};
+
+const methodThemes = {
+    yellow: { soft: '#fef3c7', strong: '#f59e0b', chipBg: '#fef9c3', chipColor: '#a16207' },
+    gray: { soft: '#e5e7eb', strong: '#4b5563', chipBg: '#f3f4f6', chipColor: '#374151' },
+    blue: { soft: '#dbeafe', strong: '#2563eb', chipBg: '#eff6ff', chipColor: '#1d4ed8' },
+    red: { soft: '#fee2e2', strong: '#ef4444', chipBg: '#fef2f2', chipColor: '#b91c1c' },
+    purple: { soft: '#ede9fe', strong: '#8b5cf6', chipBg: '#f5f3ff', chipColor: '#6d28d9' },
+    green: { soft: '#d1fae5', strong: '#10b981', chipBg: '#ecfdf5', chipColor: '#047857' }
+};
+
+const purificationMethods = [
+    { id:1, name:'SODIS (Solar Disinfection)', description:'Uses solar UV radiation to disinfect water in PET bottles.', effectiveness:['Bacteria','Viruses','Protozoa'], icon:'fa-sun', color:'yellow', animation:'sodis', timeframe:'6 to 48 hours exposure', steps:['Filter visible particles, fill clear PET bottles three-quarters full and shake for 20 seconds.','Top up completely, cap tightly, and place horizontally on a reflective surface.','Expose to strong sunlight for at least 6 hours (sunny) or 2 days (cloudy).','Let cool in the sealed bottle and pour into a clean covered container.'] },
+    { id:2, name:'Activated Carbon Filtration', description:'Removes chemicals, odors, and organic compounds through adsorption.', effectiveness:['Chemicals','Odors','Taste','Chlorine'], icon:'fa-filter', color:'gray', animation:'carbon-filter', timeframe:'Continuous flow treatment', steps:['Prime the cartridge until rinse water runs clear.','Pass water slowly through the filter to allow adequate contact time.','Collect filtered water in a clean lidded container.','Replace the cartridge regularly to maintain effectiveness.'] },
+    { id:3, name:'Reverse Osmosis', description:'Membrane filtration removing dissolved solids and microorganisms.', effectiveness:['TDS','Heavy metals','Bacteria','Viruses'], icon:'fa-exchange-alt', color:'blue', animation:'reverse-osmosis', timeframe:'Pressurised membrane process', steps:['Pre-filter incoming water if needed, then feed into the RO system at recommended pressure.','Allow the membrane to separate purified water from the reject stream.','Collect treated water in the storage tank provided.','Flush the membrane and replace filters on schedule.'] },
+    { id:4, name:'Boiling', description:'Heating water to 100°C to kill pathogens.', effectiveness:['All pathogens','Viruses','Bacteria'], icon:'fa-fire', color:'red', animation:'boiling', timeframe:'A few minutes', steps:['Pour water into a clean pot and heat to a vigorous rolling boil.','Keep boiling for at least 1 minute, or 3 minutes at higher elevations.','Remove from heat and let cool naturally while covered.','Store in a sanitised covered container.'] },
+    { id:5, name:'UV Radiation', description:'Ultraviolet light disrupts microorganism DNA.', effectiveness:['Bacteria','Viruses','Protozoa'], icon:'fa-bolt', color:'purple', animation:'uv-light', timeframe:'Rapid disinfection', steps:['Reduce turbidity first so UV light can penetrate effectively.','Fill the UV chamber to the recommended level and switch on the UV source.','Expose for the full treatment cycle specified by the manufacturer.','Transfer treated water into a clean covered container.'] },
+    { id:6, name:'Combination System', description:'Multi-stage system combining multiple methods.', effectiveness:['Comprehensive','All contaminants','Maximum safety'], icon:'fa-cogs', color:'green', animation:'pulse-slow', timeframe:'Multi-stage purification', steps:['Start with a turbidity-reduction step (settling, cloth filtration, or carbon filter).','Follow with the main treatment stage matched to the primary risk.','Add a final polishing or disinfection step such as UV treatment.','Store finished water in a clean covered container and maintain every stage.'] }
+];
+
+const safetyCategories = [
+    { name:'Excellent', color:'bg-green-100 text-green-800', score:90, description:'Water is safe for drinking without treatment' },
+    { name:'Good', color:'bg-blue-100 text-blue-800', score:75, description:'Minor treatment recommended for optimal safety' },
+    { name:'Moderate', color:'bg-yellow-100 text-yellow-800', score:60, description:'Treatment required before consumption' },
+    { name:'Poor', color:'bg-orange-100 text-orange-800', score:40, description:'Immediate treatment necessary' },
+    { name:'Critical', color:'bg-red-100 text-red-800', score:20, description:'Multiple treatment methods required' }
+];
+
+const scoringConfig = {
+    weights: { ph:0.4, tds:0.3, turbidity:0.3 },
+    ph: { safeMin:6.5, safeMax:8.5, ideal:7.2, boundaryScore:75, severeLimit:10.5 },
+    turbidity: { preferredMax:1, safeMax:5, severeMax:20 },
+    tds: { idealMax:300, safeMax:500, elevatedMax:1000, severeMax:2000 }
+};
+
+let assessmentHistory = [];
+let lastAssessment = null;
+
+function clamp(v,mn,mx){ return Math.min(mx,Math.max(mn,v)); }
+function interpolate(v,fl,fh,tl,th){ if(fh===fl)return th; return tl+((v-fl)/(fh-fl))*(th-tl); }
+
+function scorePh(ph){
+    const {safeMin,safeMax,ideal,boundaryScore,severeLimit}=scoringConfig.ph;
+    let score,status='optimal',issues=[];
+    if(ph>=safeMin&&ph<=safeMax){ score=ph<=ideal?interpolate(ph,safeMin,ideal,boundaryScore,100):interpolate(ph,ideal,safeMax,100,boundaryScore); if(ph<=6.7||ph>=8.3){status='moderate';issues.push('pH is inside the acceptable range but close to the boundary.');} }
+    else{ const d=ph<safeMin?safeMin-ph:ph-safeMax; score=interpolate(clamp(d,0,severeLimit-safeMax),0,severeLimit-safeMax,boundaryScore,0); status='unsafe'; issues.push('pH is outside the recommended 6.5–8.5 range.'); }
+    return{value:ph,status,score:Math.round(clamp(score,0,100)),issues};
+}
+function scoreTurbidity(t){
+    const{preferredMax,safeMax,severeMax}=scoringConfig.turbidity;
+    let score,status='optimal',issues=[];
+    if(t<=preferredMax){score=100;}
+    else if(t<=safeMax){score=interpolate(t,preferredMax,safeMax,100,60);status='moderate';issues.push('Turbidity is above the preferred ≤1 NTU level.');}
+    else{score=interpolate(clamp(t,safeMax,severeMax),safeMax,severeMax,60,0);status='unsafe';issues.push('Turbidity is above 5 NTU and must be reduced before drinking.');}
+    return{value:t,status,score:Math.round(clamp(score,0,100)),issues};
+}
+function scoreTds(tds){
+    const{idealMax,safeMax,elevatedMax,severeMax}=scoringConfig.tds;
+    let score,status='optimal',issues=[];
+    if(tds<=idealMax){score=100;}
+    else if(tds<=safeMax){score=interpolate(tds,idealMax,safeMax,100,85);}
+    else if(tds<=elevatedMax){score=interpolate(tds,safeMax,elevatedMax,85,45);status='moderate';issues.push('TDS is above the recommended 500 mg/L level.');}
+    else{score=interpolate(clamp(tds,elevatedMax,severeMax),elevatedMax,severeMax,45,0);status='unsafe';issues.push('TDS is very high — membrane-based treatment recommended.');}
+    return{value:tds,status,score:Math.round(clamp(score,0,100)),issues};
+}
+function assessWaterQuality(ph,turbidity,tds,temperature,chlorine){
+    const phA=scorePh(ph),tA=scoreTurbidity(turbidity),dA=scoreTds(tds);
+    const issues=[...phA.issues,...tA.issues,...dA.issues];
+    const overallScore=Math.round(phA.score*scoringConfig.weights.ph+dA.score*scoringConfig.weights.tds+tA.score*scoringConfig.weights.turbidity);
+    const safetyCategory=safetyCategories.find(c=>overallScore>=c.score)||safetyCategories[safetyCategories.length-1];
+    return{ph:phA,turbidity:tA,tds:dA,overallScore,safetyCategory,issues,recommendedMethods:getRecommendedMethods(ph,turbidity,tds,overallScore),temperature,chlorine};
+}
+function getRecommendedMethods(ph,turbidity,tds,score){
+    let m=[];
+    if(score<90)m.push(purificationMethods[3]);
+    if(turbidity>3)m.push(purificationMethods[1]);
+    if(tds>300)m.push(purificationMethods[2]);
+    if(score<70)m.push(purificationMethods[0],purificationMethods[4]);
+    if(score<50)m.push(purificationMethods[5]);
+    return m.filter((x,i,s)=>i===s.findIndex(y=>y.id===x.id));
+}
+
+function getNextSampleId(){
+    const highest=assessmentHistory.reduce((mx,e)=>{const m=e.sampleId.match(/#(\d+)/);return m?Math.max(mx,parseInt(m[1],10)):mx;},0);
+    return`Sample #${String(highest+1).padStart(3,'0')}`;
+}
+function createHistoryEntry(values,assessment,timestamp,sampleId){return{id:`${sampleId}-${timestamp}`,sampleId,timestamp,values,assessment};}
+function saveHistory(){localStorage.setItem(HISTORY_STORAGE_KEY,JSON.stringify(assessmentHistory.map(e=>({id:e.id,sampleId:e.sampleId,timestamp:e.timestamp,values:e.values}))));}
+function loadHistory(){
+    try{
+        const raw=localStorage.getItem(HISTORY_STORAGE_KEY);
+        if(!raw)return[];
+        const parsed=JSON.parse(raw);
+        if(!Array.isArray(parsed))return[];
+        return parsed.map(e=>{
+            const v={...(e.values||{}),datasetTag:e.values?.datasetTag||'General',sourceType:e.values?.sourceType||'Other'};
+            const a=assessWaterQuality(Number(v.ph),Number(v.turbidity),Number(v.tds),Number(v.temperature),Number(v.chlorine));
+            return createHistoryEntry(v,a,e.timestamp,e.sampleId);
+        }).filter(e=>e.assessment);
+    }catch{return[];}
+}
+function formatRelativeTime(ts){
+    const m=Math.max(0,Math.round((Date.now()-new Date(ts).getTime())/60000));
+    if(m<1)return'Just now';if(m<60)return`${m}m ago`;
+    const h=Math.round(m/60);if(h<24)return`${h}h ago`;
+    return`${Math.round(h/24)}d ago`;
+}
+function formatRecordedAt(ts){return new Date(ts).toLocaleString();}
+function getUniqueDatasetTags(){return[...new Set(assessmentHistory.map(e=>e.values.datasetTag||'General'))].sort((a,b)=>a.localeCompare(b));}
+
+function updateStatusIndicator(id,status){
+    const el=document.getElementById(id);
+    const map={optimal:['Optimal','bg-green-100 text-green-800'],moderate:['Moderate','bg-yellow-100 text-yellow-800'],unsafe:['Unsafe','bg-red-100 text-red-800']};
+    const[text,cls]=map[status]||['Unknown','bg-gray-100 text-gray-800'];
+    el.textContent=text;el.className=`px-3 py-1 rounded-full text-sm font-medium ${cls}`;
+}
+
+function displayResults(assessment){
+    const statuses=[assessment.ph.status,assessment.turbidity.status,assessment.tds.status];
+    const hasUnsafe=statuses.includes('unsafe'),hasModerate=statuses.includes('moderate');
+    document.getElementById('phValue').textContent=assessment.ph.value.toFixed(1);
+    document.getElementById('turbidityValue').textContent=assessment.turbidity.value.toFixed(1)+' NTU';
+    document.getElementById('tdsValue').textContent=assessment.tds.value.toFixed(0)+' mg/L';
+    updateStatusIndicator('phStatus',assessment.ph.status);
+    updateStatusIndicator('turbidityStatus',assessment.turbidity.status);
+    updateStatusIndicator('tdsStatus',assessment.tds.status);
+    document.getElementById('qualityScore').textContent=assessment.overallScore;
+    document.getElementById('safetyLevel').textContent=assessment.safetyCategory.name;
+    document.getElementById('treatmentNeeded').textContent=hasUnsafe||assessment.overallScore<75?'Required':hasModerate?'Recommended':'Not Required';
+    document.getElementById('riskCategory').textContent=hasUnsafe?'High':hasModerate?'Medium':'Low';
+    const badge=document.getElementById('waterCategory');
+    badge.textContent=assessment.safetyCategory.name;
+    badge.className=`px-4 py-2 rounded-full font-semibold ${assessment.safetyCategory.color}`;
+    displayRecommendedMethods(assessment.recommendedMethods);
+    document.getElementById('resultsSection').classList.remove('hidden');
+    document.getElementById('aiAdvisorPanel').textContent='Click "Get AI Advice" to receive a detailed interpretation of your water quality results and personalised treatment guidance.';
+}
+
+function displayRecommendedMethods(methods){
+    const container=document.getElementById('recommendedMethods');
+    container.innerHTML='';
+    if(methods.length===0){container.innerHTML=`<div class="col-span-full text-center py-8"><div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4"><i class="fas fa-check text-green-500 text-2xl"></i></div><h4 class="text-lg font-semibold text-gray-900 mb-2">Water is Safe</h4><p class="text-gray-600">No additional purification needed. Your water meets all safety standards.</p></div>`;return;}
+    methods.forEach(method=>{
+        const theme=methodThemes[method.color];
+        const card=document.createElement('div');
+        card.className='bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-shadow';
+        card.innerHTML=`<div class="flex items-center justify-center mb-4"><div class="relative w-20 h-20"><div class="absolute inset-0 rounded-lg animate-${method.animation}" style="background:${theme.soft};"></div><div class="absolute inset-2 rounded-lg flex items-center justify-center" style="background:${theme.strong};"><i class="fas ${method.icon} text-white text-2xl"></i></div></div></div><h5 class="text-lg font-bold text-gray-900 mb-2">${method.name}</h5><p class="text-gray-600 text-sm mb-3">${method.description}</p><div class="text-sm text-gray-500 mb-4">${method.timeframe}</div><div class="mb-4 p-4 rounded-lg bg-gray-50"><div class="text-sm font-medium text-gray-700 mb-3">How to carry out the process:</div><ol class="list-decimal list-inside space-y-2 text-sm text-gray-600">${method.steps.map(s=>`<li>${s}</li>`).join('')}</ol></div><div class="space-y-2"><div class="text-sm font-medium text-gray-700">Effective Against:</div><div class="flex flex-wrap gap-2">${method.effectiveness.map(e=>`<span class="px-2 py-1 rounded text-xs" style="background:${theme.chipBg};color:${theme.chipColor};">${e}</span>`).join('')}</div></div>`;
+        container.appendChild(card);
+    });
+}
+
+function updateAnalytics(){
+    if(assessmentHistory.length===0){
+        document.getElementById('avgPh').textContent='--';
+        document.getElementById('avgTurbidity').textContent='--';
+        document.getElementById('avgTds').textContent='--';
+        document.getElementById('recordCount').textContent='0 records';
+        document.getElementById('sparklineArea').innerHTML='<div class="text-sm text-gray-500 text-center py-8">Submit samples to see trend sparklines</div>';
+        return;
+    }
+    const totals=assessmentHistory.reduce((s,e)=>{s.ph+=Number(e.values.ph);s.turbidity+=Number(e.values.turbidity);s.tds+=Number(e.values.tds);return s;},{ph:0,turbidity:0,tds:0});
+    const n=assessmentHistory.length;
+    document.getElementById('avgPh').textContent=(totals.ph/n).toFixed(1);
+    document.getElementById('avgTurbidity').textContent=(totals.turbidity/n).toFixed(1);
+    document.getElementById('avgTds').textContent=Math.round(totals.tds/n);
+    document.getElementById('recordCount').textContent=`${n} record${n===1?'':'s'}`;
+    renderSparklines();
+}
+
+function renderSparklines(){
+    const records=[...assessmentHistory].reverse().slice(-10);
+    if(records.length<2){document.getElementById('sparklineArea').innerHTML='<div class="text-sm text-gray-500 text-center py-4">Add at least 2 records to see trends</div>';return;}
+    const params=[{key:'ph',label:'pH',color:'#1e40af',min:5,max:10},{key:'turbidity',label:'Turbidity (NTU)',color:'#0ea5e9',min:0,max:null},{key:'tds',label:'TDS (mg/L)',color:'#10b981',min:0,max:null}];
+    let html='<div class="space-y-4">';
+    params.forEach(p=>{
+        const vals=records.map(r=>Number(r.values[p.key]));
+        const mn=p.min!==null?p.min:Math.min(...vals);
+        const mx=p.max!==null?p.max:Math.max(...vals)*1.1||1;
+        const range=mx-mn||1;
+        const bars=vals.map(v=>{const h=Math.max(4,Math.round(((v-mn)/range)*60));return`<div class="sparkline-bar rounded-t" style="width:${Math.max(6,Math.floor(260/vals.length)-2)}px;height:${h}px;background:${p.color};opacity:0.8;" title="${v}"></div>`;}).join('');
+        html+=`<div><div class="flex justify-between text-xs text-gray-500 mb-1"><span>${p.label}</span><span>Last ${vals.length} records</span></div><div class="flex items-end gap-1 h-16 border-b border-gray-200 pb-1">${bars}</div></div>`;
+    });
+    html+='</div>';
+    document.getElementById('sparklineArea').innerHTML=html;
+}
+
+function renderHistory(){
+    const historyList=document.getElementById('historyList');
+    if(assessmentHistory.length===0){historyList.innerHTML='<div class="p-4 bg-gray-50 rounded-lg text-sm text-gray-500">Your submitted assessment records will appear here.</div>';return;}
+    historyList.innerHTML=assessmentHistory.slice(0,8).map(e=>`
+        <div class="flex items-start justify-between gap-4 p-4 bg-gray-50 rounded-lg">
+            <div>
+                <div class="font-medium text-gray-900">${e.sampleId}</div>
+                <div class="text-sm text-gray-500">${formatRelativeTime(e.timestamp)}</div>
+                <div class="text-xs text-gray-400 mt-1">${formatRecordedAt(e.timestamp)}</div>
+                <div class="flex flex-wrap gap-2 mt-2">
+                    <span class="source-badge bg-emerald-50 text-emerald-700">${e.values.datasetTag||'General'}</span>
+                    <span class="source-badge bg-indigo-50 text-indigo-700">${e.values.sourceType||'Other'}</span>
+                    <span class="source-badge bg-blue-50 text-blue-700">pH ${Number(e.values.ph).toFixed(1)}</span>
+                    <span class="source-badge bg-blue-50 text-blue-700">${Number(e.values.turbidity).toFixed(1)} NTU</span>
+                    <span class="source-badge bg-blue-50 text-blue-700">${Number(e.values.tds).toFixed(0)} mg/L</span>
+                </div>
+            </div>
+            <span class="px-3 py-1 rounded-full text-sm font-medium whitespace-nowrap ${e.assessment.safetyCategory.color}">${e.assessment.safetyCategory.name}</span>
+        </div>
+    `).join('');
+}
+
+function clampVal(v,mn,mx){return Math.min(mx,Math.max(mn,v));}
+function predictNextValue(records,key,minV,maxV){
+    if(records.length===0)return null;
+    if(records.length===1)return clampVal(Number(records[0].values[key]),minV,maxV);
+    const pts=records.map((r,i)=>({x:i+1,y:Number(r.values[key])}));
+    const sums=pts.reduce((a,p)=>({sumX:a.sumX+p.x,sumY:a.sumY+p.y,sumXY:a.sumXY+p.x*p.y,sumXX:a.sumXX+p.x*p.x}),{sumX:0,sumY:0,sumXY:0,sumXX:0});
+    const n=pts.length,den=(n*sums.sumXX)-(sums.sumX*sums.sumX);
+    const slope=den===0?0:((n*sums.sumXY)-(sums.sumX*sums.sumY))/den;
+    const intercept=(sums.sumY-(slope*sums.sumX))/n;
+    return clampVal(intercept+(slope*(n+1)),minV,maxV);
+}
+
+function updatePredictionTagFilter(){
+    const sel=document.getElementById('predictionTagFilter');
+    const cur=sel.value||'all';
+    const tags=getUniqueDatasetTags();
+    sel.innerHTML=`<option value="all">All Tags</option>${tags.map(t=>`<option value="${t}"${t===cur?' selected':''}>${t}</option>`).join('')}`;
+    if(cur!=='all'&&!tags.includes(cur))sel.value='all';
+}
+
+function renderPrediction(){
+    const summary=document.getElementById('predictionSummary');
+    const selTag=document.getElementById('predictionTagFilter').value;
+    const records=(selTag==='all'?assessmentHistory:assessmentHistory.filter(e=>(e.values.datasetTag||'General')===selTag)).slice(0,6).reverse();
+    if(records.length<2){summary.innerHTML=`<div class="text-sm text-gray-600">Save at least 2 ${selTag==='all'?'':'"'+selTag+'" '}records to generate a future category prediction.</div>`;return;}
+    const pPh=predictNextValue(records,'ph',0,14);
+    const pT=predictNextValue(records,'turbidity',0,50);
+    const pD=predictNextValue(records,'tds',0,3000);
+    const avgTemp=records.reduce((s,r)=>s+Number(r.values.temperature||25),0)/records.length;
+    const avgCl=records.reduce((s,r)=>s+Number(r.values.chlorine||0),0)/records.length;
+    const pred=assessWaterQuality(pPh,pT,pD,avgTemp,avgCl);
+    const confidence=records.length>=4?'High':records.length>=3?'Medium':'Low';
+    const confColor=confidence==='High'?'text-green-700':confidence==='Medium'?'text-yellow-700':'text-red-700';
+    summary.innerHTML=`
+        <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+            <div>
+                <div class="text-sm text-gray-500 mb-1">Predicted next category</div>
+                <div class="text-xl font-bold text-gray-900 mb-1">${pred.safetyCategory.name}</div>
+                <div class="text-sm ${confColor}"><i class="fas fa-signal mr-1"></i>Confidence: ${confidence} (${records.length} records)</div>
+                <div class="text-sm text-gray-600 mt-1">Based on the last ${records.length} ${selTag==='all'?'saved records':'"'+selTag+'" records'}.</div>
+            </div>
+            <span class="px-3 py-1 rounded-full text-sm font-medium self-start ${pred.safetyCategory.color}">Score ${pred.overallScore}</span>
+        </div>
+        <div class="grid grid-cols-3 gap-3 mt-4">
+            <div class="p-3 bg-white rounded-lg border border-blue-100"><div class="text-xs text-gray-500">Predicted pH</div><div class="text-lg font-semibold text-gray-900">${pPh.toFixed(2)}</div></div>
+            <div class="p-3 bg-white rounded-lg border border-blue-100"><div class="text-xs text-gray-500">Predicted Turbidity</div><div class="text-lg font-semibold text-gray-900">${pT.toFixed(2)} NTU</div></div>
+            <div class="p-3 bg-white rounded-lg border border-blue-100"><div class="text-xs text-gray-500">Predicted TDS</div><div class="text-lg font-semibold text-gray-900">${pD.toFixed(0)} mg/L</div></div>
+        </div>`;
+}
+
+function storeAssessment(values,assessment){
+    const ts=new Date().toISOString();
+    const entry=createHistoryEntry(values,assessment,ts,getNextSampleId());
+    assessmentHistory=[entry,...assessmentHistory].slice(0,20);
+    saveHistory();updateAnalytics();renderHistory();updatePredictionTagFilter();renderPrediction();
+}
+
+/* ─── PRESET UI ─── */
+function renderPresets(tab){
+    const grid=document.getElementById('presetGrid');
+    const items=PRESETS[tab]||[];
+    grid.innerHTML=items.map((p,i)=>`
+        <button class="river-btn border border-gray-200 rounded-lg p-3 text-left hover:border-primary" data-preset="${tab}-${i}">
+            <div class="font-medium text-sm text-gray-900 leading-tight">${p.name}</div>
+            <div class="text-xs text-gray-400 mt-1">${p.src}</div>
+            <div class="flex flex-wrap gap-1 mt-2">
+                <span class="text-xs bg-blue-50 text-blue-600 px-1 rounded">pH ${p.ph}</span>
+                <span class="text-xs bg-teal-50 text-teal-600 px-1 rounded">${p.turbidity} NTU</span>
+                <span class="text-xs bg-purple-50 text-purple-600 px-1 rounded">${p.tds} mg/L</span>
+            </div>
+        </button>
+    `).join('');
+    grid.querySelectorAll('[data-preset]').forEach(btn=>{
+        btn.addEventListener('click',()=>{
+            const[t,idx]=btn.dataset.preset.split('-');
+            const p=PRESETS[t][parseInt(idx)];
+            document.getElementById('phLevel').value=p.ph;
+            document.getElementById('turbidity').value=p.turbidity;
+            document.getElementById('tds').value=p.tds;
+            document.getElementById('temperature').value=p.temp;
+            document.getElementById('sourceType').value=p.src;
+            document.getElementById('datasetTag').value=p.tag;
+            document.getElementById('chlorine').value=0;
+            grid.querySelectorAll('.river-btn').forEach(b=>b.classList.remove('active'));
+            btn.classList.add('active');
+        });
+    });
+}
+
+/* ─── AI ADVISOR ─── */
+async function getAiAdvice(assessment,values){
+    const panel=document.getElementById('aiAdvisorPanel');
+    panel.innerHTML='<div class="flex items-center gap-2 text-blue-600"><div class="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div> Consulting AI advisor…</div>';
+    try{
+        const prompt=`You are an expert water quality advisor. A user has submitted the following water quality assessment results:
+
+- Source Type: ${values.sourceType}
+- Dataset Tag: ${values.datasetTag}
+- pH: ${values.ph} (safe range: 6.5–8.5)
+- Turbidity: ${values.turbidity} NTU (safe: <5 NTU)
+- TDS: ${values.tds} mg/L (safe: <500 mg/L)
+- Temperature: ${values.temperature}°C
+- Overall Quality Score: ${assessment.overallScore}/100
+- Safety Category: ${assessment.safetyCategory.name}
+- Issues detected: ${assessment.issues.length>0?assessment.issues.join('; '):'None'}
+- Recommended methods: ${assessment.recommendedMethods.map(m=>m.name).join(', ')||'None required'}
+
+Write a concise 3–4 paragraph response (no markdown headers) covering: (1) a plain-language interpretation of these results, (2) what the most concerning parameter is and why, (3) which purification method you would prioritise and a brief practical tip for implementing it, (4) any seasonal or regional considerations relevant to the source type. Write in a friendly but expert tone. Keep it under 200 words.`;
+
+        const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
+        const data=await resp.json();
+        const text=data?.content?.filter(c=>c.type==='text').map(c=>c.text).join('')||'No response received.';
+        panel.innerHTML=`<div class="text-gray-700 leading-relaxed whitespace-pre-wrap">${text}</div>`;
+    }catch(err){
+        panel.innerHTML=`<div class="text-red-600 text-sm"><i class="fas fa-exclamation-triangle mr-1"></i>Could not reach the AI advisor. Please check your connection and try again.</div>`;
+    }
+}
+
+/* ─── CSV EXPORT ─── */
+function exportCsv(){
+    if(assessmentHistory.length===0){alert('No records to export. Submit at least one assessment first.');return;}
+    const headers=['Sample ID','Timestamp','Source Type','Tag','pH','Turbidity (NTU)','TDS (mg/L)','Temperature (°C)','Chlorine (mg/L)','Quality Score','Safety Category'];
+    const rows=assessmentHistory.map(e=>[e.sampleId,new Date(e.timestamp).toISOString(),e.values.sourceType||'Other',e.values.datasetTag||'General',e.values.ph,e.values.turbidity,e.values.tds,e.values.temperature,e.values.chlorine,e.assessment.overallScore,e.assessment.safetyCategory.name]);
+    const csv=[headers,...rows].map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+    const blob=new Blob([csv],{type:'text/csv'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');a.href=url;a.download=`aquapure-records-${new Date().toISOString().slice(0,10)}.csv`;a.click();URL.revokeObjectURL(url);
+}
+
+/* ─── INIT ─── */
+document.addEventListener('DOMContentLoaded',()=>{
+    document.getElementById('phLevel').value=7.2;
+    document.getElementById('turbidity').value=2.1;
+    document.getElementById('tds').value=245;
+
+    assessmentHistory=loadHistory();
+    updateAnalytics();renderHistory();updatePredictionTagFilter();renderPrediction();
+    if(assessmentHistory.length>0)displayResults(assessmentHistory[0].assessment);
+
+    /* Tab switching */
+    let currentTab='asia';
+    renderPresets('asia');
+    document.querySelectorAll('.tab-btn').forEach(btn=>{
+        btn.addEventListener('click',()=>{
+            document.querySelectorAll('.tab-btn').forEach(b=>{b.classList.remove('active');b.classList.add('text-gray-500');b.classList.remove('text-primary');});
+            btn.classList.add('active');btn.classList.remove('text-gray-500');
+            currentTab=btn.dataset.tab;
+            renderPresets(currentTab);
+        });
+    });
+
+    /* Form submit */
+    document.getElementById('waterAssessmentForm').addEventListener('submit',e=>{
+        e.preventDefault();
+        const ph=parseFloat(document.getElementById('phLevel').value);
+        const turbidity=parseFloat(document.getElementById('turbidity').value);
+        const tds=parseFloat(document.getElementById('tds').value);
+        const temperature=parseFloat(document.getElementById('temperature').value)||25;
+        const chlorine=parseFloat(document.getElementById('chlorine').value)||0;
+        const datasetTag=(document.getElementById('datasetTag').value||'').trim()||'General';
+        const sourceType=document.getElementById('sourceType').value||'Other';
+        if(isNaN(ph)||isNaN(turbidity)||isNaN(tds)){alert('Please enter valid numbers for pH, turbidity, and TDS.');return;}
+        const assessment=assessWaterQuality(ph,turbidity,tds,temperature,chlorine);
+        const values={ph,turbidity,tds,temperature,chlorine,datasetTag,sourceType};
+        lastAssessment={assessment,values};
+        displayResults(assessment);
+        storeAssessment(values,assessment);
+        document.getElementById('resultsSection').scrollIntoView({behavior:'smooth'});
+    });
+
+    /* AI Advice button */
+    document.getElementById('getAiAdviceBtn').addEventListener('click',()=>{
+        if(!lastAssessment){alert('Please run an assessment first.');return;}
+        getAiAdvice(lastAssessment.assessment,lastAssessment.values);
+    });
+
+    /* CSV export */
+    document.getElementById('exportCsvBtn').addEventListener('click',exportCsv);
+
+    /* Clear history */
+    document.getElementById('clearHistoryBtn').addEventListener('click',()=>{
+        if(!confirm('Clear all saved records? This cannot be undone.'))return;
+        assessmentHistory=[];saveHistory();updateAnalytics();renderHistory();updatePredictionTagFilter();renderPrediction();
+    });
+
+    /* Prediction filter */
+    document.getElementById('predictionTagFilter').addEventListener('change',renderPrediction);
+
+    /* Mobile menu */
+    document.getElementById('mobileMenuBtn').addEventListener('click',()=>{
+        document.getElementById('mobileMenu').classList.toggle('hidden');
+    });
+
+    /* Smooth scroll */
+    document.querySelectorAll('a[href^="#"]').forEach(a=>{
+        a.addEventListener('click',e=>{
+            e.preventDefault();
+            const t=document.querySelector(a.getAttribute('href'));
+            if(t)t.scrollIntoView({behavior:'smooth',block:'start'});
+            document.getElementById('mobileMenu').classList.add('hidden');
+        });
+    });
+});
+</script>
+</body>
+</html>
